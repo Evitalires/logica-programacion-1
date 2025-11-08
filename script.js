@@ -1,64 +1,90 @@
 const numberInput = document.getElementById("numberInput");
 const numberForm = document.getElementById("numberForm");
 const numerosIngresados = document.getElementById("numerosIngresados");
-const numberFormError = document.getElementById("numberFormError")
+const numberFormError = document.getElementById("numberFormError");
+const numerosOrdenados = document.getElementById("numerosOrdenados");
 
-function arangeNumbers(numbers) {
-    // Convertimos la lista de hijos en un array real
-    const numbersList = Array.from(numbers.children);
-    console.log(numbersList);
-    
-    const newList = [];
+function arrangeNumbers(numbers) {
+  const numbersList = Array.from(numbers.children);
+  let newList = [];
+  console.log(numbersList.length);
 
+  if (numbersList.length > 1 && numbersList.length < 4) {
+    // limpiar la lista ordenada anterior
+    numerosOrdenados.innerHTML = "";
 
     numbersList.forEach((element, i, array) => {
-        const actualNum = parseFloat(element.innerText.replace(/[^0-9]/g, ""));
-        
-        // Verificamos si hay un siguiente elemento
-        if (array[i + 1]) {
-            const siguienteNum = parseFloat(array[i + 1].innerText.replace(/[^0-9]/g, ""));
-            console.log(actualNum);
-            
-            // Comparación numérica
-            if (actualNum > siguienteNum) {
-                newList.push(actualNum);
-                console.log(newList);
-                
-            }
-        }
-        console.log("Nueva Lista");
-        console.log(newList);
-        
+      const actualNum = parseFloat(element.innerText.replace(/[^0-9]/g, ""));
+      if (array[i - 1]) {
+        const prevNum = parseFloat(array[i - 1].innerText.replace(/[^0-9]/g, ""));
+        if (actualNum >= prevNum) newList.push(actualNum);
+        else newList.unshift(actualNum);
+      } else {
+        newList.push(actualNum);
+      }
     });
+  } else if (numbersList.length === 1) {
+    newList.push(parseFloat(numbersList[0].innerText.replace(/[^0-9]/g, "")));
+  }
+  
 
-    console.log("Lista original:", numbersList.map(e => e.innerText));
-    console.log("Nuevos valores (mayores que el siguiente):", newList);
+  // mostrar la nueva lista
+  newList.forEach(num => {
+    const li = document.createElement("li");
+    li.textContent = num;
+    numerosOrdenados.appendChild(li);
+  });
+
+  console.log("Lista ordenada:", newList);
 }
 
 function newNumber(numberParam) {
-    let newNumber = document.createElement("li")
-        newNumber.innerHTML = numberParam || numberInput.value;
-        let button = document.createElement("button");
-        button.innerHTML = "❌";
-        button.className = "newNumberDelete";
-        newNumber.appendChild(button);
-        numerosIngresados.appendChild(newNumber);
-    return numerosIngresados; 
+  const newLi = document.createElement("li");
+  newLi.innerHTML = numberParam || numberInput.value;
+
+  const button = document.createElement("button");
+  button.innerHTML = "❌";
+  button.className = "newNumberDelete";
+  button.onclick = () => {
+    newLi.remove();
+    arrangeNumbers(numerosIngresados);
+  };
+
+  newLi.appendChild(button);
+  numerosIngresados.appendChild(newLi);
+  return numerosIngresados;
 }
 
 numberForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    if(numerosIngresados.childElementCount == 3) {
-        let numberError = document.getElementById("numberError")
-    } else if(numberInput.value !=="") {
-        arangeNumbers(newNumber());
-    } else {
-        numberFormError.innerHTML = "Ingrese un valor";
-    }
-    numberInput.value = "";
+  e.preventDefault();
+  numberFormError.textContent = "";
 
-})
+  const valor = numberInput.value.trim();
 
-numberInput.addEventListener("keydown", ( e ) => {
-    if(e.key == "enter") console.log("enter");
-})
+  if (!valor) {
+    numberFormError.textContent = "Ingrese un valor";
+    return;
+  }
+  console.log(valor);
+
+  // Agregar número
+  console.log(numerosIngresados);
+  
+  console.log(numerosIngresados.length);
+  //Limitar el ingreso de numeros a 3
+  if(numerosIngresados.childElementCount < 3) {
+    let lista = newNumber(valor);
+    arrangeNumbers(lista);
+  } else {
+    // Ordenar lista
+    arrangeNumbers(numerosIngresados);
+    numberFormError.textContent = "Elimine un numero para ingresar mas numeros";
+  }
+  
+  // Limpiar input
+  numberInput.value = "";
+});
+
+numberInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") console.log("Enter presionado");
+});
