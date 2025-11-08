@@ -7,9 +7,8 @@ const numerosOrdenados = document.getElementById("numerosOrdenados");
 function arrangeNumbers(numbers) {
   const numbersList = Array.from(numbers.children);
   let newList = [];
-  console.log(numbersList.length);
 
-  if (numbersList.length > 1 && numbersList.length < 4) {
+  if (numbersList.length >= 0 && numbersList.length < 4) {
     // limpiar la lista ordenada anterior
     numerosOrdenados.innerHTML = "";
 
@@ -17,6 +16,8 @@ function arrangeNumbers(numbers) {
       const actualNum = parseFloat(element.innerText.replace(/[^0-9]/g, ""));
       if (array[i - 1]) {
         const prevNum = parseFloat(array[i - 1].innerText.replace(/[^0-9]/g, ""));
+        
+        if(actualNum == prevNum) console.log("Numero Iguales");
         if (actualNum >= prevNum) newList.push(actualNum);
         else newList.unshift(actualNum);
       } else {
@@ -27,6 +28,7 @@ function arrangeNumbers(numbers) {
     newList.push(parseFloat(numbersList[0].innerText.replace(/[^0-9]/g, "")));
   }
   
+  
 
   // mostrar la nueva lista
   newList.forEach(num => {
@@ -35,7 +37,6 @@ function arrangeNumbers(numbers) {
     numerosOrdenados.appendChild(li);
   });
 
-  console.log("Lista ordenada:", newList);
 }
 
 function newNumber(numberParam) {
@@ -47,6 +48,8 @@ function newNumber(numberParam) {
   button.className = "newNumberDelete";
   button.onclick = () => {
     newLi.remove();
+    console.dir(numerosIngresados);
+    
     arrangeNumbers(numerosIngresados);
   };
 
@@ -65,12 +68,8 @@ numberForm.addEventListener("submit", (e) => {
     numberFormError.textContent = "Ingrese un valor";
     return;
   }
-  console.log(valor);
 
-  // Agregar número
-  console.log(numerosIngresados);
-  
-  console.log(numerosIngresados.length);
+ 
   //Limitar el ingreso de numeros a 3
   if(numerosIngresados.childElementCount < 3) {
     let lista = newNumber(valor);
@@ -83,8 +82,4 @@ numberForm.addEventListener("submit", (e) => {
   
   // Limpiar input
   numberInput.value = "";
-});
-
-numberInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") console.log("Enter presionado");
 });
